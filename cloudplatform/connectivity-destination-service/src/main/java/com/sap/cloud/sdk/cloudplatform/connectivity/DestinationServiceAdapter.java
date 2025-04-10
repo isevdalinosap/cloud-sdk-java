@@ -13,11 +13,15 @@ import java.util.function.Supplier;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.util.EntityUtils;
 import org.slf4j.event.Level;
 
 import com.google.common.base.Strings;
@@ -137,6 +141,41 @@ class DestinationServiceAdapter
             throw new DestinationAccessException(e);
         }
         return handleResponse(request, response);
+    }
+
+    @Nonnull
+    String getConfigurationAsJson2( boolean singleDest, String destinationName )
+        throws DestinationAccessException,
+            DestinationNotFoundException
+    {
+        HttpUriRequest request;
+        if( singleDest ) {
+            request = new HttpGet("http://sap-transp-proxy-manager:9090/getDestination");
+            request.addHeader("destinationName", destinationName);
+        } else {
+            request = new HttpGet("http://sap-transp-proxy-manager:9090/listDestinations");
+        }
+
+        HttpClient client = HttpClientBuilder.create().build();
+
+        try {
+            HttpResponse response = client.execute(request);
+            HttpEntity entity = response.getEntity();
+            String responseBody = EntityUtils.toString(entity, "UTF-8");
+            return responseBody;
+        }
+        catch( Exception e ) {
+            e.printStackTrace();
+            return "";
+        }
+    }
+
+    @Nonnull
+    String getConfigurationAsJson( boolean singleDest, String destinationName )
+        throws DestinationAccessException,
+            DestinationNotFoundException
+    {
+       return "";
     }
 
     @Nonnull

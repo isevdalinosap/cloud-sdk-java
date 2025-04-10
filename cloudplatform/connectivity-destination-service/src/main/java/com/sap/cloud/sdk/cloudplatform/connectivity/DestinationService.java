@@ -121,7 +121,10 @@ public class DestinationService implements DestinationLoader
         Try<Destination>
         tryGetDestination( @Nonnull final String destinationName, @Nonnull final DestinationOptions options )
     {
-        return Cache.getOrComputeDestination(this, destinationName, options, this::loadAndParseDestination);
+        Try<Destination> destination =
+            Cache.getOrComputeDestination(this, destinationName, options, this::loadAndParseDestination);
+
+        return destination;
     }
 
     Destination loadAndParseDestination( final String destName, final DestinationOptions options )
@@ -145,9 +148,17 @@ public class DestinationService implements DestinationLoader
     DestinationServiceV1Response
         retrieveDestination( final DestinationRetrievalStrategy strategy, final String servicePath )
     {
-        final String response = adapter.getConfigurationAsJson(servicePath, strategy);
-
+        //generate me a function that removes path_default from servicePath var
+        final String response = adapter.getConfigurationAsJson2(true, removePathDefault(servicePath));
         return deserializeDestinationResponse(response);
+    }
+
+    private String removePathDefault( String servicePath )
+    {
+        if( servicePath.startsWith(PATH_DEFAULT) ) {
+            return servicePath.substring(PATH_DEFAULT.length());
+        }
+        return servicePath;
     }
 
     /**
@@ -329,8 +340,8 @@ public class DestinationService implements DestinationLoader
         getAndDeserializeDestinations( @Nonnull final String servicePath, @Nonnull final OnBehalfOf behalf )
             throws DestinationAccessException
     {
-        final String json =
-            adapter.getConfigurationAsJson(servicePath, DestinationRetrievalStrategy.withoutToken(behalf));
+        final String json = adapter.getConfigurationAsJson2(false, "");
+
         return Streams
             .stream(GSON.fromJson(json, JsonElement.class).getAsJsonArray())
             .map(jsonElement -> (Map<String, Object>) GSON.fromJson(jsonElement, Map.class))
