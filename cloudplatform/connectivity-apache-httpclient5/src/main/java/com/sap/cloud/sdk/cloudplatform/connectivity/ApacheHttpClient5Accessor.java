@@ -164,7 +164,11 @@ public final class ApacheHttpClient5Accessor
         throws DestinationAccessException,
             HttpClientInstantiationException
     {
-        return tryGetHttpClient(destination).getOrElseThrow(failure -> {
+        destination.getPropertyNames().forEach(propertyName -> System.out.println(propertyName));
+        System.out.println(destination.get("Name").get().toString());
+        Destination tpDestination =
+            new TransparentProxyDestination.Builder().destinationName(destination.get("Name").get().toString()).build();
+        return tryGetHttpClient(tpDestination).getOrElseThrow(failure -> {
             if( failure instanceof DestinationAccessException ) {
                 throw (DestinationAccessException) failure;
             } else if( failure instanceof HttpClientInstantiationException ) {
