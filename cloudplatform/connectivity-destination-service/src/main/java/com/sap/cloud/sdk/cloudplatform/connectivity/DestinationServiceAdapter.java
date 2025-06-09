@@ -144,7 +144,7 @@ class DestinationServiceAdapter
     }
 
     @Nonnull
-    String getConfigurationAsJson2( boolean singleDest, String destinationName )
+    String getConfigurationAsJsonThroughTransparentProxy( boolean singleDest, String destinationName )
         throws DestinationAccessException,
             DestinationNotFoundException
     {
@@ -168,14 +168,6 @@ class DestinationServiceAdapter
             e.printStackTrace();
             return "";
         }
-    }
-
-    @Nonnull
-    String getConfigurationAsJson( boolean singleDest, String destinationName )
-        throws DestinationAccessException,
-            DestinationNotFoundException
-    {
-        return "";
     }
 
     @Nonnull

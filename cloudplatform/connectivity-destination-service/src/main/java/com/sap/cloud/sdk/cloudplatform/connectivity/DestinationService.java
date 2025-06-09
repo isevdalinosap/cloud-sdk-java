@@ -148,8 +148,8 @@ public class DestinationService implements DestinationLoader
     DestinationServiceV1Response
         retrieveDestination( final DestinationRetrievalStrategy strategy, final String servicePath )
     {
-        //generate me a function that removes path_default from servicePath var
-        final String response = adapter.getConfigurationAsJson2(true, removePathDefault(servicePath));
+        final String response =
+            adapter.getConfigurationAsJsonThroughTransparentProxy(true, removePathDefault(servicePath));
         return deserializeDestinationResponse(response);
     }
 
@@ -340,7 +340,7 @@ public class DestinationService implements DestinationLoader
         getAndDeserializeDestinations( @Nonnull final String servicePath, @Nonnull final OnBehalfOf behalf )
             throws DestinationAccessException
     {
-        final String json = adapter.getConfigurationAsJson2(false, "");
+        final String json = adapter.getConfigurationAsJsonThroughTransparentProxy(false, "");
 
         return Streams
             .stream(GSON.fromJson(json, JsonElement.class).getAsJsonArray())
